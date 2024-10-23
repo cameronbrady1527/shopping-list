@@ -31,6 +31,9 @@ function addItem(e) {
     const li = createLI(item);
 
     itemList.appendChild(li);
+    checkUI();
+
+    itemInput.value = '';
 }
 
 function createLI(item) {
@@ -49,38 +52,61 @@ function createLI(item) {
 }
 
 function removeItem(e) {
-    if (e.target.tagName === 'I') { e.target.parentNode.parentNode.remove(); }
+    if (e.target.tagName === 'I') { 
+        if (confirm('Are you sure?')) {
+            e.target.parentNode.parentNode.remove(); 
+        }
+    }
+
+    checkUI();
 }
 
 function removeAllItems() {
-    document.querySelectorAll('li').forEach((li) => {
-        li.remove();
-    });
+    if (confirm('Are you sure?')) {
+        document.querySelectorAll('li').forEach((li) => {
+            li.remove();
+        });
+    }
+    
+    checkUI();
+}
+
+function checkUI() {
+    // Checks the UI to see if there are items (STATE OF APPLICATION)
+    const items = itemList.querySelectorAll('li');
+
+    if (items.length === 0) {
+        clearBtn.style.display = 'none';
+        filter.style.display = 'none';
+    } else {
+        clearBtn.style.display = 'block';
+        filter.style.display = 'block';
+    }
 }
 
 function filterItems(e) {
     // read the text in the filter input area
-    // console.log(e.target.value);
-    const text = e.target.value;
-    console.log(text);
-    // check if text is in the firstChild of each li
-    document.querySelectorAll('li').forEach((li) => {
-        console.log(li.firstElementChild);
+    const items = itemList.querySelectorAll('li');
+    const text = e.target.value.toLowerCase();
+    
+    // Check if the items in item list contain the filter text
+    items.forEach((item) => {
+        const itemName = item.firstChild.textContent.toLowerCase();
+        
+        if (itemName.indexOf(text) != -1) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
     });
-        // if yes, display
-
-        // if no, hide element
 }
-
 
 // EVENT LISTENERS
 form.addEventListener('submit', addItem);
-
 itemList.addEventListener('click', removeItem);
-
 clearBtn.addEventListener('click', removeAllItems);
+filter.addEventListener('input', filterItems);
+// filter.addEventListener('keyup', filterItems);
 
-filter.addEventListener('keyup', filterItems);
 
-
-
+checkUI();
